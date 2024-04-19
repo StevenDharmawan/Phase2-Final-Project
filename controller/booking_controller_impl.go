@@ -18,6 +18,20 @@ func NewBookingController(bookingService service.BookingService) *BookingControl
 	return &BookingControllerImpl{BookingService: bookingService}
 }
 
+// CreateBooking
+// @Summary Create a new booking
+// @Description Create a new booking for a room
+// @Tags bookings
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param Authorization header string true "Bearer token"
+// @Param bookingRequest body request.BookingRequest true "Booking input"
+// @Success 201 {object} response.Response{message=string, data=domain.Booking, invoice=domain.Invoice} "Booking Room Success!"
+// @Failure 400 {object} response.ErrorResponse "Bad request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/bookings [post]
 func (controller *BookingControllerImpl) CreateBooking(c *gin.Context) {
 	claims := helper.GetClaimsFromCookie(c)
 	userID := claims.UserID

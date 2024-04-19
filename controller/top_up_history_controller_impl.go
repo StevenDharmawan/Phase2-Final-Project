@@ -16,6 +16,18 @@ func NewTopUpHistoryController(topUpHistoryService service.TopUpHistoryService) 
 	return &TopUpHistoryControllerImpl{TopUpHistoryService: topUpHistoryService}
 }
 
+// GetAllHistoryById
+// @Summary Get all top-up histories by wallet ID
+// @Description Retrieve all top-up histories associated with a wallet by wallet ID
+// @Tags TopUpHistories
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param walletID path int true "Wallet ID"
+// @Success 200 {object} response.Response{message=string, data=[]domain.TopUpHistory} "Successfully retrieved all top-up histories"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/users/topuphistories [get]
 func (controller *TopUpHistoryControllerImpl) GetAllHistoryById(c *gin.Context) {
 	claims := helper.GetClaimsFromCookie(c)
 	walletID := claims.WalletID
@@ -30,6 +42,17 @@ func (controller *TopUpHistoryControllerImpl) GetAllHistoryById(c *gin.Context) 
 	})
 }
 
+// GetAllHistory
+// @Summary Get all top-up histories
+// @Description Retrieve all top-up histories
+// @Tags TopUpHistories
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} response.Response{message=string, data=[]domain.TopUpHistory} "Successfully retrieved all top-up histories"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/topuphistories [get]
 func (controller *TopUpHistoryControllerImpl) GetAllHistory(c *gin.Context) {
 	responses, errResponse := controller.TopUpHistoryService.GetAllHistory()
 	if errResponse != nil {

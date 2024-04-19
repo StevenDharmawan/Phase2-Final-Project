@@ -18,6 +18,18 @@ func NewUserController(userService service.UserService) *UserControllerImpl {
 	return &UserControllerImpl{UserService: userService}
 }
 
+// RegisterAdmin
+// @Summary Register admin user
+// @Description Register admin user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param registerRequest body request.RegisterRequest true "Registration admin input"
+// @Success 201 {object} response.Response{message=string, data=response.UserResponse} "Successfully registered admin user"
+// @Failure 400 {object} response.ErrorResponse "Bad request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/users/register/admin [post]
 func (controller *UserControllerImpl) RegisterAdmin(c *gin.Context) {
 	registerRequest := request.RegisterRequest{}
 	err := c.ShouldBindJSON(&registerRequest)
@@ -38,6 +50,18 @@ func (controller *UserControllerImpl) RegisterAdmin(c *gin.Context) {
 	})
 }
 
+// RegisterUser
+// @Summary Register user
+// @Description Register user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param registerRequest body request.RegisterRequest true "Registration input"
+// @Success 201 {object} response.Response{message=string, data=response.UserResponse} "Successfully registered user"
+// @Failure 400 {object} response.ErrorResponse "Bad request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/users/register [post]
 func (controller *UserControllerImpl) RegisterUser(c *gin.Context) {
 	registerRequest := request.RegisterRequest{}
 	err := c.ShouldBindJSON(&registerRequest)
@@ -64,6 +88,18 @@ func (controller *UserControllerImpl) RegisterUser(c *gin.Context) {
 	}
 }
 
+// LoginUser
+// @Summary Login user
+// @Description Login user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param loginRequest body request.LoginRequest true "Login input"
+// @Success 200 {object} response.Response{message=string} "Successfully logged in user"
+// @Failure 400 {object} response.ErrorResponse "Bad request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/users/login [post]
 func (controller *UserControllerImpl) LoginUser(c *gin.Context) {
 	loginRequest := request.LoginRequest{}
 	err := c.ShouldBindJSON(&loginRequest)
@@ -88,6 +124,18 @@ func (controller *UserControllerImpl) LoginUser(c *gin.Context) {
 	})
 }
 
+// UpdateUser
+// @Summary Update user profile
+// @Description Update user profile
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param updateUserRequest body request.UpdateUserRequest true "Update user profile input"
+// @Success 200 {object} response.Response{message=string, data=response.UserResponse} "Successfully updated user profile"
+// @Failure 400 {object} response.ErrorResponse "Bad request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/users [put]
 func (controller *UserControllerImpl) UpdateUser(c *gin.Context) {
 	claims := helper.GetClaimsFromCookie(c)
 	userID := claims.UserID
@@ -109,6 +157,16 @@ func (controller *UserControllerImpl) UpdateUser(c *gin.Context) {
 	})
 }
 
+// GetUser
+// @Summary Get user profile
+// @Description Get user profile
+// @Tags users
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Response{message=string, data=domain.User} "Successfully retrieved user profile"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/users [get]
 func (controller *UserControllerImpl) GetUser(c *gin.Context) {
 	claims := helper.GetClaimsFromCookie(c)
 	userID := claims.UserID

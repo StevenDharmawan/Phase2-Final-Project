@@ -18,6 +18,19 @@ func NewWalletController(walletService service.WalletService) *WalletControllerI
 	return &WalletControllerImpl{WalletService: walletService}
 }
 
+// TopUpWallet
+// @Summary Top up wallet balance
+// @Description Top up wallet balance
+// @Tags wallets
+// @Accept json
+// @Produce json
+// @Param walletRequest body request.WalletRequest true "Wallet top-up input"
+// @Security ApiKeyAuth
+// @Success 200 {object} response.Response{message=string, data=domain.Wallet} "Successfully topped up wallet balance"
+// @Failure 400 {object} response.ErrorResponse "Bad request"
+// @Failure 401 {object} response.ErrorResponse "Unauthorized"
+// @Failure 500 {object} response.ErrorResponse "Internal server error"
+// @Router /api/v1/wallets [post]
 func (controller *WalletControllerImpl) TopUpWallet(c *gin.Context) {
 	claims := helper.GetClaimsFromCookie(c)
 	userID := claims.UserID
