@@ -8,6 +8,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"phase2-final-project/config"
 	"phase2-final-project/controller"
+	_ "phase2-final-project/docs"
 	"phase2-final-project/middlewares"
 	"phase2-final-project/repository"
 	"phase2-final-project/service"
@@ -59,9 +60,8 @@ func main() {
 	bookingRepository := repository.NewBookingRepository(db)
 	bookingService := service.NewBookingService(bookingRepository, roomRepository, walletRepository, userRepository)
 	bookingController := controller.NewBookingController(bookingService)
-	url := ginSwagger.URL("https://phase2-final-project-d73478d4951c.herokuapp.com/swagger/doc.json") // The url pointing to API definition
 	r := gin.Default()
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	v1 := r.Group("/api/v1")
 	{
 		v1.POST("/users/register/admin", userController.RegisterAdmin)

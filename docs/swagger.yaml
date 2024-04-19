@@ -1,4 +1,173 @@
 basePath: /api/v1
+definitions:
+  domain.Booking:
+    properties:
+      checkin_date:
+        type: string
+      checkout_date:
+        type: string
+      id:
+        type: integer
+      room_id:
+        type: integer
+      status:
+        type: string
+      total_price:
+        type: number
+      user_id:
+        type: integer
+    type: object
+  domain.Invoice:
+    properties:
+      id:
+        type: string
+      invoice_url:
+        type: string
+    type: object
+  domain.Room:
+    properties:
+      availability:
+        type: boolean
+      category:
+        type: string
+      id:
+        type: integer
+      price:
+        type: number
+      room_number:
+        type: string
+    type: object
+  domain.TopUpHistory:
+    properties:
+      amount_top_up:
+        type: number
+      id:
+        type: integer
+      top_up_date_time:
+        type: string
+      wallet_id:
+        type: integer
+    type: object
+  domain.User:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      fullName:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        type: string
+      wallet:
+        $ref: '#/definitions/domain.Wallet'
+    type: object
+  domain.Wallet:
+    properties:
+      balance:
+        type: number
+      id:
+        type: integer
+      top_up_history:
+        items:
+          $ref: '#/definitions/domain.TopUpHistory'
+        type: array
+      user_id:
+        type: integer
+    type: object
+  request.BookingRequest:
+    properties:
+      checkin_date:
+        type: string
+      checkout_date:
+        type: string
+      room_id:
+        type: integer
+    type: object
+  request.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  request.RegisterRequest:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        type: string
+    required:
+    - age
+    - email
+    - full_name
+    - password
+    type: object
+  request.RoomRequest:
+    properties:
+      availability:
+        type: boolean
+      category:
+        type: string
+      price:
+        type: number
+      room_number:
+        type: string
+    type: object
+  request.UpdateUserRequest:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        type: string
+    type: object
+  request.WalletRequest:
+    properties:
+      amount_top_up:
+        type: number
+    type: object
+  response.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      detail: {}
+      message:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      invoice: {}
+      message:
+        type: string
+    type: object
+  response.UserResponse:
+    properties:
+      age:
+        type: integer
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      wallet:
+        $ref: '#/definitions/domain.Wallet'
+    type: object
 host: https://phase2-final-project-d73478d4951c.herokuapp.com/:8080
 info:
   contact:
@@ -12,5 +181,468 @@ info:
   termsOfService: http://swagger.io/terms/
   title: Final Project Phase 2 - Hotel
   version: "1.0"
-paths: {}
+paths:
+  /api/v1/bookings:
+    post:
+      consumes:
+      - application/json
+      description: Create a new booking for a room
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Booking input
+        in: body
+        name: bookingRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.BookingRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Booking Room Success!
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  $ref: '#/definitions/domain.Booking'
+                ' invoice':
+                  $ref: '#/definitions/domain.Invoice'
+                message:
+                  type: string
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new booking
+      tags:
+      - bookings
+  /api/v1/rooms:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all rooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  items:
+                    $ref: '#/definitions/domain.Room'
+                  type: array
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get all rooms
+      tags:
+      - rooms
+    post:
+      consumes:
+      - application/json
+      description: Create a new room
+      parameters:
+      - description: Room input
+        in: body
+        name: roomRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.RoomRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  $ref: '#/definitions/domain.Room'
+                message:
+                  type: string
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Create a new room
+      tags:
+      - rooms
+  /api/v1/rooms/availability:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all available rooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  items:
+                    $ref: '#/definitions/domain.Room'
+                  type: array
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get all available rooms
+      tags:
+      - rooms
+  /api/v1/topuphistories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all top-up histories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all top-up histories
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  items:
+                    $ref: '#/definitions/domain.TopUpHistory'
+                  type: array
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all top-up histories
+      tags:
+      - TopUpHistories
+  /api/v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Get user profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved user profile
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  $ref: '#/definitions/domain.User'
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get user profile
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update user profile
+      parameters:
+      - description: Update user profile input
+        in: body
+        name: updateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated user profile
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  $ref: '#/definitions/response.UserResponse'
+                message:
+                  type: string
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Update user profile
+      tags:
+      - users
+  /api/v1/users/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: Login input
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully logged in user
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                message:
+                  type: string
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Login user
+      tags:
+      - users
+  /api/v1/users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register user
+      parameters:
+      - description: Registration input
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully registered user
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  $ref: '#/definitions/response.UserResponse'
+                message:
+                  type: string
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Register user
+      tags:
+      - users
+  /api/v1/users/register/admin:
+    post:
+      consumes:
+      - application/json
+      description: Register admin user
+      parameters:
+      - description: Registration admin input
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully registered admin user
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  $ref: '#/definitions/response.UserResponse'
+                message:
+                  type: string
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Register admin user
+      tags:
+      - users
+  /api/v1/users/topuphistories:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve all top-up histories associated with a wallet by wallet
+        ID
+      parameters:
+      - description: Wallet ID
+        in: path
+        name: walletID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved all top-up histories
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  items:
+                    $ref: '#/definitions/domain.TopUpHistory'
+                  type: array
+                message:
+                  type: string
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all top-up histories by wallet ID
+      tags:
+      - TopUpHistories
+  /api/v1/wallets:
+    post:
+      consumes:
+      - application/json
+      description: Top up wallet balance
+      parameters:
+      - description: Wallet top-up input
+        in: body
+        name: walletRequest
+        required: true
+        schema:
+          $ref: '#/definitions/request.WalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully topped up wallet balance
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                ' data':
+                  $ref: '#/definitions/domain.Wallet'
+                message:
+                  type: string
+              type: object
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Top up wallet balance
+      tags:
+      - wallets
 swagger: "2.0"
