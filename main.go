@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"phase2-final-project/config"
 	"phase2-final-project/controller"
 	"phase2-final-project/middlewares"
@@ -19,9 +21,9 @@ func init() {
 	}
 }
 
-// @title Swagger Example API
+// @title Final Project Phase 2 - Hotel
 // @version 1.0
-// @description This is a sample server Petstore server.
+// @description API for hotel.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
@@ -31,7 +33,7 @@ func init() {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host petstore.swagger.io:8080
+// @host https://phase2-final-project-d73478d4951c.herokuapp.com/:8080
 // @BasePath /api/v1
 func main() {
 	db, err := config.ConnectDB()
@@ -57,8 +59,9 @@ func main() {
 	bookingRepository := repository.NewBookingRepository(db)
 	bookingService := service.NewBookingService(bookingRepository, roomRepository, walletRepository, userRepository)
 	bookingController := controller.NewBookingController(bookingService)
-
+	url := ginSwagger.URL("https://phase2-final-project-d73478d4951c.herokuapp.com/swagger/doc.json") // The url pointing to API definition
 	r := gin.Default()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	v1 := r.Group("/api/v1")
 	{
 		v1.POST("/users/register/admin", userController.RegisterAdmin)
